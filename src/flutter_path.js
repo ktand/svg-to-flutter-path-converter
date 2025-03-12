@@ -15,18 +15,18 @@ const PaintType = {
 }
 
 class PathOperation {
-  createSizeDependentToken(sizeProperty, number, round) {
-    const roundedNumber = helpers.roundNumber(number, round);
+  createSizeDependentToken(sizeProperty, number) {
+    // const number = helpers.roundNumber(number);
 
-    if (roundedNumber == 0) {
+    if (number == 0) {
       return '0';
     }
 
-    if (roundedNumber == 1) {
+    if (number == 1) {
       return `size.${sizeProperty}`;
     }
 
-    return `size.${sizeProperty} * ${roundedNumber}`;
+    return `size.${sizeProperty} * ${number}`;
   }
 }
 
@@ -37,9 +37,9 @@ class MoveToOperation extends PathOperation {
     this.y = y;
   }
 
-  toFlutterCommand(round = 2) {
-    const x = this.createSizeDependentToken('width', this.x, round);
-    const y = this.createSizeDependentToken('height', this.y, round);
+  toFlutterCommand(round = 10) {
+    const x = this.createSizeDependentToken('width', this.x);
+    const y = this.createSizeDependentToken('height', this.y);
 
     return `path.moveTo(${x}, ${y});`;
   }
@@ -52,9 +52,9 @@ class LineToOperation extends PathOperation {
     this.y = y;
   }
 
-  toFlutterCommand(round = 2) {
-    const x = this.createSizeDependentToken('width', this.x, round);
-    const y = this.createSizeDependentToken('height', this.y, round);
+  toFlutterCommand(round = 10) {
+    const x = this.createSizeDependentToken('width', this.x);
+    const y = this.createSizeDependentToken('height', this.y);
 
     return `path.lineTo(${x}, ${y});`;
   }
@@ -71,13 +71,13 @@ class CubicToOperation extends PathOperation {
     this.y3 = y3;
   }
 
-  toFlutterCommand(round = 2) {
-    const x1 = this.createSizeDependentToken('width', this.x1, round);
-    const y1 = this.createSizeDependentToken('height', this.y1, round);
-    const x2 = this.createSizeDependentToken('width', this.x2, round);
-    const y2 = this.createSizeDependentToken('height', this.y2, round);
-    const x3 = this.createSizeDependentToken('width', this.x3, round);
-    const y3 = this.createSizeDependentToken('height', this.y3, round);
+  toFlutterCommand(round = 10) {
+    const x1 = this.createSizeDependentToken('width', this.x1);
+    const y1 = this.createSizeDependentToken('height', this.y1);
+    const x2 = this.createSizeDependentToken('width', this.x2);
+    const y2 = this.createSizeDependentToken('height', this.y2);
+    const x3 = this.createSizeDependentToken('width', this.x3);
+    const y3 = this.createSizeDependentToken('height', this.y3);
 
     return `path.cubicTo(${x1}, ${y1}, ${x2}, ${y2}, ${x3}, ${y3});`;
   }
@@ -91,10 +91,10 @@ class AddOvalOperation extends PathOperation {
     this.radius = radius;
   }
 
-  toFlutterCommand(round = 2) {
-    const x = this.createSizeDependentToken('width', this.x, round);
-    const y = this.createSizeDependentToken('height', this.y, round);
-    const radius = this.createSizeDependentToken('width', this.radius, round);
+  toFlutterCommand(round = 10) {
+    const x = this.createSizeDependentToken('width', this.x);
+    const y = this.createSizeDependentToken('height', this.y);
+    const radius = this.createSizeDependentToken('width', this.radius);
 
     return `path.addOval(Rect.fromCircle(center: Offset(${x}, ${y}), radius: ${radius}));`;
   }
@@ -231,21 +231,6 @@ class FlutterCustomPaintPrinter {
       .concat(linesBefore)
       .concat(linesPaths)
       .concat(linesAfter).join('\n');
-  }
-}
-
-let helpers = {
-  roundNumber: function (num, scale) {
-    if (!("" + num).includes("e")) {
-      return +(Math.round(num + "e+" + scale) + "e-" + scale);
-    } else {
-      let arr = ("" + num).split("e");
-      let sig = ""
-      if (+arr[1] + scale > 0) {
-        sig = "+";
-      }
-      return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
-    }
   }
 }
 
